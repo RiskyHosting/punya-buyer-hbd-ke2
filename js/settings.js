@@ -18,7 +18,7 @@ pages: [
     { image: './foto/IMG-20260430-WA0001.jpg', content: 'Selamat ulang tahun, cintaku! 🌹' },
     { image: './foto/IMG-20260430-WA0002.jpg', content: 'Kamu adalah hadiah terindah dalam hidupku 💝' },
     { image: './foto/IMG-20260430-WA0003.jpg', content: 'Happy Birthday Sayang 💗' },
-    { image: './foto/IMG-20260430-WA0004.jpg', content: 'Tersenyumlah selalu, karena senyummu adalah mentahiku ☀️' },
+    { image: './foto/IMG-20260430-WA0004.jpg', content: 'Tersenyumlah selalu, karena senyummu adalah mentariku ☀️' },
     { image: './foto/IMG-20260430-WA0005.jpg', content: 'As long as you’re smiling, I’m happy. Stay happy, my love.' },
     { image: './foto/IMG-20260430-WA0006.jpg', content: 'Setiap detik bersamamu adalah anugerah terindah ✨' },
     { image: './foto/belakang.png' }
@@ -441,7 +441,7 @@ function initializeDefaultSettings() {
             { image: './foto/IMG-20260430-WA0001.jpg', content: 'Selamat ulang tahun, cintaku! 🌹' },
             { image: './foto/IMG-20260430-WA0002.jpg', content: 'Kamu adalah hadiah terindah dalam hidupku 💝' },
             { image: './foto/IMG-20260430-WA0003.jpg', content: 'Happy Birthday Sayang 💗' },
-            { image: './foto/IMG-20260430-WA0004.jpg', content: 'Tersenyumlah selalu, karena senyummu adalah mentahiku ☀️' },
+            { image: './foto/IMG-20260430-WA0004.jpg', content: 'Tersenyumlah selalu, karena senyummu adalah mentariku ☀️' },
             { image: './foto/IMG-20260430-WA0005.jpg', content: 'As long as you’re smiling, I’m happy. Stay happy, my love.' },
             { image: './foto/IMG-20260430-WA0006.jpg', content: 'Setiap detik bersamamu adalah anugerah terindah ✨' },
             { image: './foto/belakang.png' }
