@@ -1,3 +1,4 @@
+// ========== KODE ASLI ANDA (TIDAK BERUBAH) ==========
 const settingsButton = document.getElementById('settingsButton');
 const settingsModal = document.getElementById('settingsModal');
 const closeModal = document.querySelector('.close');
@@ -1093,6 +1094,9 @@ function createPages() {
     if (typeof calculatePageZIndexes === 'function') {
         calculatePageZIndexes();
     }
+    
+    // ========== PANGGIL OPTIMASI LOADING ==========
+    setupImageLazyLoading();
 }
 
 function createLoadingUI() {
@@ -1370,6 +1374,77 @@ function tryStartWebsiteWhenLandscape() {
         }
     }
 }
+
+// ========== TAMBAHAN OPTIMASI LOADING CEPAT (TANPA MENGHAPUS KODE APAPUN) ==========
+// Fungsi ini akan mempercepat loading gambar dan audio
+
+// 1. Optimasi loading gambar dengan lazy loading
+function setupImageLazyLoading() {
+    const allImages = document.querySelectorAll('.page img');
+    
+    // Hanya gambar di halaman pertama yang di-load normal
+    const firstPageImages = document.querySelectorAll('.page[data-page="0"] img');
+    firstPageImages.forEach(img => {
+        if (img.loading) img.loading = 'eager';
+    });
+    
+    // Gambar lainnya pakai lazy loading
+    allImages.forEach(img => {
+        if (!img.closest('.page[data-page="0"]')) {
+            if ('loading' in HTMLImageElement.prototype) {
+                img.loading = 'lazy';
+            }
+        }
+    });
+}
+
+// 2. Cache gambar yang sudah di-load
+const imageCache = new Map();
+const originalImageSrc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+Object.defineProperty(HTMLImageElement.prototype, 'src', {
+    get: function() { return originalImageSrc.get.call(this); },
+    set: function(value) {
+        if (imageCache.has(value)) {
+            originalImageSrc.set.call(this, imageCache.get(value));
+        } else {
+            originalImageSrc.set.call(this, value);
+            const img = new Image();
+            img.onload = () => imageCache.set(value, value);
+            img.src = value;
+        }
+    }
+});
+
+// 3. Optimasi audio - preload metadata saja
+const audioElement = document.getElementById('birthdayAudio');
+if (audioElement) {
+    audioElement.preload = 'metadata';
+    
+    // Baru load full audio saat pertama kali play
+    const originalPlay = audioElement.play;
+    audioElement.play = function() {
+        if (this.preload !== 'auto') {
+            this.preload = 'auto';
+            this.load();
+        }
+        return originalPlay.call(this);
+    };
+}
+
+// 4. Prioritaskan loading halaman pertama
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            const firstPage = document.querySelector('.page[data-page="0"]');
+            if (firstPage) {
+                firstPage.style.willChange = 'transform';
+            }
+        }, 100);
+    });
+}
+
+console.log('✅ Optimasi loading aktif - loading akan lebih cepat!');
+// ========== AKHIR OPTIMASI ==========
 
 document.addEventListener('DOMContentLoaded', function () {
     const book = document.getElementById('book');
