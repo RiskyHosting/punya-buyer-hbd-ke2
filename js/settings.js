@@ -1,4 +1,3 @@
-// ========== KODE ASLI ANDA (TIDAK BERUBAH) ==========
 const settingsButton = document.getElementById('settingsButton');
 const settingsModal = document.getElementById('settingsModal');
 const closeModal = document.querySelector('.close');
@@ -1094,9 +1093,6 @@ function createPages() {
     if (typeof calculatePageZIndexes === 'function') {
         calculatePageZIndexes();
     }
-    
-    // ========== PANGGIL OPTIMASI LOADING ==========
-    setupImageLazyLoading();
 }
 
 function createLoadingUI() {
@@ -1375,75 +1371,84 @@ function tryStartWebsiteWhenLandscape() {
     }
 }
 
-// ========== TAMBAHAN OPTIMASI LOADING CEPAT (TANPA MENGHAPUS KODE APAPUN) ==========
-// Fungsi ini akan mempercepat loading gambar dan audio
+// ========== TAMBAHAN OPTIMASI LOADING CEPAT (TIDAK MENGHAPUS KODE APAPUN) ==========
 
-// 1. Optimasi loading gambar dengan lazy loading
-function setupImageLazyLoading() {
+// 1. Cegah loading semua gambar sekaligus
+document.addEventListener('DOMContentLoaded', function() {
+    // Tunda loading gambar yang tidak terlihat
     const allImages = document.querySelectorAll('.page img');
-    
-    // Hanya gambar di halaman pertama yang di-load normal
-    const firstPageImages = document.querySelectorAll('.page[data-page="0"] img');
-    firstPageImages.forEach(img => {
-        if (img.loading) img.loading = 'eager';
-    });
-    
-    // Gambar lainnya pakai lazy loading
     allImages.forEach(img => {
-        if (!img.closest('.page[data-page="0"]')) {
-            if ('loading' in HTMLImageElement.prototype) {
-                img.loading = 'lazy';
+        if (!img.closest('.page:not(.flipped)')) {
+            const src = img.src;
+            if (src && !src.includes('placeholder')) {
+                img.removeAttribute('src');
+                img.setAttribute('data-src', src);
             }
         }
     });
-}
-
-// 2. Cache gambar yang sudah di-load
-const imageCache = new Map();
-const originalImageSrc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
-Object.defineProperty(HTMLImageElement.prototype, 'src', {
-    get: function() { return originalImageSrc.get.call(this); },
-    set: function(value) {
-        if (imageCache.has(value)) {
-            originalImageSrc.set.call(this, imageCache.get(value));
-        } else {
-            originalImageSrc.set.call(this, value);
-            const img = new Image();
-            img.onload = () => imageCache.set(value, value);
-            img.src = value;
+    
+    // Load hanya gambar halaman pertama
+    const firstPageImages = document.querySelectorAll('.page:not(.flipped) img');
+    firstPageImages.forEach(img => {
+        const dataSrc = img.getAttribute('data-src');
+        if (dataSrc) {
+            img.src = dataSrc;
+            img.removeAttribute('data-src');
         }
-    }
+    });
 });
 
-// 3. Optimasi audio - preload metadata saja
-const audioElement = document.getElementById('birthdayAudio');
-if (audioElement) {
-    audioElement.preload = 'metadata';
-    
-    // Baru load full audio saat pertama kali play
-    const originalPlay = audioElement.play;
-    audioElement.play = function() {
-        if (this.preload !== 'auto') {
-            this.preload = 'auto';
-            this.load();
-        }
-        return originalPlay.call(this);
+// 2. Load gambar saat flip halaman
+const originalNextPageFast = window.nextPage;
+if (originalNextPageFast) {
+    window.nextPage = function() {
+        originalNextPageFast();
+        setTimeout(function() {
+            const currentPage = document.querySelector('.page.flipped');
+            if (currentPage) {
+                const images = currentPage.querySelectorAll('img[data-src]');
+                images.forEach(img => {
+                    img.src = img.getAttribute('data-src');
+                    img.removeAttribute('data-src');
+                });
+            }
+        }, 50);
     };
 }
 
-// 4. Prioritaskan loading halaman pertama
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => {
-            const firstPage = document.querySelector('.page[data-page="0"]');
-            if (firstPage) {
-                firstPage.style.willChange = 'transform';
+const originalPrevPageFast = window.prevPage;
+if (originalPrevPageFast) {
+    window.prevPage = function() {
+        originalPrevPageFast();
+        setTimeout(function() {
+            const currentPage = document.querySelector('.page.flipped');
+            if (currentPage) {
+                const images = currentPage.querySelectorAll('img[data-src]');
+                images.forEach(img => {
+                    img.src = img.getAttribute('data-src');
+                    img.removeAttribute('data-src');
+                });
             }
-        }, 100);
-    });
+        }, 50);
+    };
 }
 
-console.log('✅ Optimasi loading aktif - loading akan lebih cepat!');
+// 3. Optimasi audio - preload lebih cerdas
+const audioElementFast = document.getElementById('birthdayAudio');
+if (audioElementFast) {
+    audioElementFast.preload = 'none';
+    const originalPlayFast = audioElementFast.play;
+    audioElementFast.play = function() {
+        if (this.preload === 'none') {
+            this.preload = 'auto';
+            this.load();
+        }
+        return originalPlayFast.call(this);
+    };
+}
+
+console.log('✅ Optimasi loading aktif - loading gambar lebih cepat!');
+
 // ========== AKHIR OPTIMASI ==========
 
 document.addEventListener('DOMContentLoaded', function () {
